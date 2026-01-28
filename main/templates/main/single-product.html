@@ -1,0 +1,233 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Thryft - {{ product.name }}</title>
+
+    <link rel="stylesheet" href="{% static 'main/assets/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'main/assets/css/font-awesome.css' %}">
+    <link rel="stylesheet" href="{% static 'main/assets/css/templatemo-hexashop.css' %}">
+    <link rel="stylesheet" href="{% static 'main/assets/css/owl-carousel.css' %}">
+    <link rel="stylesheet" href="{% static 'main/assets/css/lightbox.css' %}">
+    
+
+    <style>
+        /* --- CUSTOM STYLES FOR CLEANER LAYOUT --- */
+        
+        /* 1. Center the product image */
+        .left-images {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        .left-images img {
+            max-height: 500px; /* Prevents image from being too huge */
+            width: auto;       /* Keeps aspect ratio */
+            max-width: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        /* 2. Spacing for the right side details */
+        .right-content {
+            padding-top: 20px;
+            padding-left: 20px;
+        }
+        .right-content h4 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .right-content .price {
+            font-size: 24px;
+            color: #2a2a2a;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 15px;
+        }
+        
+        /* 3. Style the Description & Quote */
+        .right-content p {
+            line-height: 1.6;
+            color: #777;
+            margin-bottom: 25px;
+        }
+        .quote {
+            margin: 20px 0;
+            font-style: italic;
+            color: #aaa;
+        }
+        .quote i { 
+            float: left; 
+            margin-right: 10px; 
+            color: #2a2a2a; 
+        }
+
+        /* 4. The Action Area (Input + Button) */
+        .action-area {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* Space between input and button */
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #eee;
+        }
+        
+        input[type="number"] {
+            width: 70px;
+            height: 45px;
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 0; /* Square edges like screenshot */
+            font-size: 16px;
+        }
+
+        .btn-black {
+            background-color: #2a2a2a;
+            color: white;
+            border: none;
+            height: 45px;
+            padding: 0 30px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 0; /* Square edges */
+        }
+
+        .btn-black:hover {
+            background-color: #ff6f61; /* Thryft Accent Color */
+            color: white;
+        }
+    </style>
+  </head>
+    
+  <body>
+    
+    <header class="header-area header-sticky">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <nav class="main-nav">
+                        <a href="{% url 'home' %}" class="logo">
+                            <img src="{% static 'main/assets/images/trift.png' %}" alt="Thryft Logo">
+                        </a>
+                        <ul class="nav">
+                            <li><a href="{% url 'home' %}">Home</a></li>
+                            <li><a href="{% url 'home' %}#men">Men's</a></li>
+                            <li><a href="{% url 'home' %}#women">Women's</a></li>
+                            <li><a href="{% url 'products' %}" class="active">Products</a></li>
+                            
+                            {% if request.session.username %}
+                                <li><a href="{% url 'cart' %}"><i class='fas fa-cart-plus' style='font-size:18px;'></i></a></li>
+                                <li><a href="{% url 'dashboard' %}"><i class="fa fa-user" style="font-size: 20px;"></i></a></li>
+                            {% else %}
+                                <li><a href="{% url 'login' %}">Login</a></li>
+                            {% endif %}
+                        </ul>        
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-heading" id="top">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="inner-content">
+                        <h2>{{ product.name }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div id="toast" style="display:block; position:fixed; bottom:20px; right:20px; background-color:#333; color:#fff; padding:12px 20px; border-radius:6px; box-shadow:0 2px 10px rgba(0,0,0,0.2); z-index:9999;">
+                {{ message }}
+            </div>
+            <script>setTimeout(() => { document.getElementById('toast').style.display = 'none'; }, 3000);</script>
+        {% endfor %}
+    {% endif %}
+
+    <section class="section" id="product">
+        <div class="container">
+            <div class="row align-items-center"> <div class="col-lg-6">
+                    <div class="left-images">
+                        <img src="{% static 'main/assets/images/' %}{{ product.image_path }}" alt="{{ product.name }}">
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="right-content">
+                        
+                        <h4>{{ product.name }}</h4>
+                        <span class="price">RM {{ product.price }}</span>
+                        
+                        <ul class="stars" style="list-style:none; padding:0; margin-bottom: 20px;">
+                            <li style="display:inline; color:#2a2a2a;"><i class="fa fa-star"></i></li>
+                            <li style="display:inline; color:#2a2a2a;"><i class="fa fa-star"></i></li>
+                            <li style="display:inline; color:#2a2a2a;"><i class="fa fa-star"></i></li>
+                            <li style="display:inline; color:#2a2a2a;"><i class="fa fa-star"></i></li>
+                            <li style="display:inline; color:#2a2a2a;"><i class="fa fa-star"></i></li>
+                        </ul>
+                        
+                        <p>{{ product.description|default:"No description available for this item." }}</p>
+                        
+                        <div class="quote">
+                            <i class="fa fa-quote-left"></i>
+                            <p>Unique style, sustainable choice.</p>
+                        </div>
+                        
+                        <form action="{% url 'add_to_cart' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ product.product_id }}">
+                            
+                            <div class="action-area">
+                                <div style="display:flex; flex-direction:column;">
+                                    <span style="font-size:12px; font-weight:bold; margin-bottom:5px;">Quantity</span>
+                                    <input type="number" step="1" min="1" max="10" name="quantity" value="1" title="Qty">
+                                </div>
+                                
+                                <div style="display:flex; flex-direction:column; justify-content: flex-end;">
+                                    <span style="height: 22px;"></span> <button type="submit" class="btn-black">Add To Cart</button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="under-footer">
+                        <p>Copyright © 2026 Thryft Co., Ltd. All Rights Reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'main/assets/js/jquery-2.1.0.min.js' %}"></script>
+    <script src="{% static 'main/assets/js/popper.js' %}"></script>
+    <script src="{% static 'main/assets/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'main/assets/js/owl-carousel.js' %}"></script>
+    <script src="{% static 'main/assets/js/custom.js' %}"></script>
+    <script src="{% static 'main/assets/js/scrollreveal.min.js' %}"></script>
+    <script src="{% static 'main/assets/js/custom.js' %}"></script>
+
+  </body>
+</html>

@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Manage Products - Thryft Staff</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link rel="stylesheet" href="{% static 'main/assets/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'main/assets/css/font-awesome.css' %}">
+
+  <style>
+    body { background-color: #f8f9fa; padding-top: 50px; }
+    .admin-card { background: #fff; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 20px; }
+    .product-img { width: 60px; height: 60px; object-fit: cover; border-radius: 5px; }
+    .table thead th { background-color: #2a2a2a; color: white; border: none; }
+    .btn-add { background-color: #ff6f61; color: white; margin-bottom: 20px; }
+    .btn-add:hover { background-color: #e05a4e; color: white; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="admin-card">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fa fa-shopping-bag"></i> Product Inventory</h2>
+            <div>
+                <a href="{% url 'admin_product_add' %}" class="btn btn-add">
+                    <i class="fa fa-plus"></i> Add New Product
+                </a>
+                <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="fa fa-dashboard"></i> Dashboard
+                </a>
+            </div>
+        </div>
+
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Image</th>
+                    <th>Product Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stocks</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in products %}
+                <tr>
+                    <td>{{ p.product_id }}</td>
+                    <td>
+                        <img src="{% static 'main/assets/images/' %}{{ p.image_path }}" alt="{{ p.name }}" class="product-img">
+                    </td>
+                    <td><strong>{{ p.name }}</strong></td>
+                    <td>{{ p.category.category_name|default:"Uncategorized" }}{% if p.category.gender %}({{ p.category.gender }}){% endif %}</td>
+                    <td>RM {{ p.price }}</td>
+                        <td>
+                            {% if p.stocks <= 5 %}
+                                <span class="text-danger font-weight-bold">{{ p.stock }} (Low)</span>
+                            {% else %}
+                                {{ p.stock }}
+                            {% endif %}
+                        </td>
+                    <td>
+                        <a href="{% url 'admin_product_edit' p.product_id %}" class="btn btn-sm btn-primary" title="Edit">
+                            <i class="fa fa-edit"></i>
+                        </a>
+                        <form action="{% url 'admin_product_delete' p.product_id %}" method="POST" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete {{ p.name }}?')" title="Delete">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">No products found in the database.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

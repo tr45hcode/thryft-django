@@ -1,0 +1,169 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Management - Thryft Staff</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'main/assets/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'main/assets/css/font-awesome.css' %}">
+    <style>
+        body { padding: 30px; background: #f5f5f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        
+        /* Section Styling */
+        .section-title { border-bottom: 2px solid #eee; margin-bottom: 20px; padding-bottom: 10px; display: flex; align-items: center; }
+        .section-title i { margin-right: 10px; color: #555; }
+        
+        /* Role Badges */
+        .badge-staff { background-color: #28a745; color: white; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 0.85em; }
+        .badge-customer { background-color: #007bff; color: white; padding: 6px 12px; border-radius: 4px; font-size: 0.85em; }
+        .badge-pending { background-color: #ffc107; color: #212529; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 0.85em; }
+
+        /* Row Highlighting */
+        .table-staff { border-left: 5px solid #28a745; }
+        .table-customer { border-left: 5px solid #007bff; }
+        .table-pending { border-left: 5px solid #ffc107; background-color: #fffdf5; }
+
+        .btn-sm { font-size: 0.85rem; }
+        .form-select-sm { height: 31px; padding: 2px 5px; border-radius: 4px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fa fa-users"></i> User Administration</h2>
+        <div>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary"><i class="fa fa-dashboard"></i> Dashboard</a>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}info{% endif %} alert-dismissible fade show">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="section-title">
+        <i class="fa fa-clock-o"></i> <h4>Pending Approvals</h4>
+    </div>
+    
+    <div class="table-responsive mb-5">
+        <table class="table table-hover table-bordered">
+            <thead class="table-warning">
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Date Registered</th>
+                    <th>Assign Role & Approve</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                    {% if u.role == 'pending' %}
+                    <tr class="table-pending">
+                        <td><strong>{{ u.name }}</strong></td>
+                        <td>{{ u.email }}</td>
+                        <td>{{ u.date_joined|date:"d M Y"|default:"Recently" }}</td>
+                        <td>
+                            <form method="post" action="{% url 'admin_approve_user' u.user_id %}" class="form-inline d-flex align-items-center">
+                                {% csrf_token %}
+                                <select name="role" class="form-select-sm mr-2" required>
+                                    <option value="" disabled selected>Select Role...</option>
+                                    <option value="customer">Approve as Customer</option>
+                                    <option value="staff">Approve as Staff</option>
+                                </select>
+                                <button type="submit" class="btn btn-success btn-sm mr-2">
+                                    <i class="fa fa-check"></i> Approve
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm" 
+                                        onclick="if(confirm('Reject and delete this user?')) { document.getElementById('delete-form-{{u.user_id}}').submit(); }">
+                                    <i class="fa fa-times"></i> Reject
+                                </button>
+                            </form>
+                            <form id="delete-form-{{u.user_id}}" method="post" action="{% url 'admin_user_delete' u.user_id %}" style="display:none;">
+                                {% csrf_token %}
+                            </form>
+                        </td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if not has_pending %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted">No users currently awaiting approval.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section-title">
+        <i class="fa fa-check-circle"></i> <h4>Active Users & Staff</h4>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Current Role</th>
+                    <th>Management Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                    {% if u.role != 'pending' %}
+                    <tr class="{% if u.role == 'staff' %}table-staff{% else %}table-customer{% endif %}">
+                        <td><strong>#{{ u.user_id }}</strong></td>
+                        <td>{{ u.name }}</td>
+                        <td>{{ u.email }}</td>
+                        <td>
+                            {% if u.role == 'staff' %}
+                                <span class="badge-staff"><i class="fa fa-shield"></i> STAFF</span>
+                            {% else %}
+                                <span class="badge-customer"><i class="fa fa-user"></i> CUSTOMER</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex">
+                                <form method="post" action="{% url 'admin_toggle_staff' u.user_id %}" class="mr-2">
+                                    {% csrf_token %}
+                                    {% if u.role == 'staff' %}
+                                        {% if u.user_id == request.session.user_id %}
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" disabled>Logged In</button>
+                                        {% else %}
+                                            <button type="submit" class="btn btn-warning btn-sm">Demote to Customer</button>
+                                        {% endif %}
+                                    {% else %}
+                                        <button type="submit" class="btn btn-success btn-sm">Promote to Staff</button>
+                                    {% endif %}
+                                </form>
+
+                                <form method="post" action="{% url 'admin_user_delete' u.user_id %}">
+                                    {% csrf_token %}
+                                    {% if u.user_id == request.session.user_id %}
+                                        <button type="button" class="btn btn-outline-danger btn-sm" disabled title="Cannot delete yourself"><i class="fa fa-trash"></i></button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete user #{{u.user_id}} permanently?')">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    {% endif %}
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

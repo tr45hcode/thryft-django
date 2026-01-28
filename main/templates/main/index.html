@@ -1,0 +1,251 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <title>Thryft</title>
+
+    <link rel="stylesheet" type="text/css" href="{% static 'main/assets/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'main/assets/css/font-awesome.css' %}">
+    <link rel="stylesheet" href="{% static 'main/assets/css/templatemo-hexashop.css' %}">
+    <link rel="stylesheet" href="{% static 'main/assets/css/owl-carousel.css' %}">
+    <link rel="stylesheet" href="{% static 'main/assets/css/lightbox.css' %}">
+  </head>
+    
+  <body>
+    
+    <div id="preloader">
+        <div class="jumper">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>  
+    <header class="header-area header-sticky">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <nav class="main-nav">
+                        <a href="{% url 'home' %}" class="logo">
+                        <img src="{% static 'main/assets/images/trift.png' %}" alt="Thryft Logo" >
+                        </a>
+
+                        <ul class="nav">
+                            <li class="scroll-to-section"><a href="#top" class="active">Home</a></li>
+                            <li class="scroll-to-section"><a href="#men">Men's</a></li>
+                            <li class="scroll-to-section"><a href="#women">Women's</a></li>
+                            <li><a href="{% url 'products' %}">Products</a></li>
+                            {% if request.session.username %}
+                                
+                                <li>
+                                    <a href="{% url 'cart' %}">
+                                        <i class='fas fa-cart-plus' style='font-size:18px; padding-top: 10px;'></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'dashboard' %}" title="User Dashboard">
+                                        <i class="fa fa-user" style="font-size: 20px;"></i>
+                                        <span style="font-size: 12px;">{{ request.session.username }}</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'logout' %}" style="font-size: 12px;">Logout</a>
+                                </li>
+
+                            {% else %}
+                                <li><a href="{% url 'login' %}">Login</a></li>
+                            {% endif %}
+                        </ul>     
+                        <a class='menu-trigger'>
+                            <span>Menu</span>
+                        </a>
+                        </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="main-banner" id="top" style="margin-top: 120px;">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="left-content">
+                        <div class="thumb">
+                            <div class="inner-content">
+                                <h4>Welcome to Thryft</h4>
+                                <span>Style That Speaks for You<br> Discover timeless fashion, crafted for your everyday elegance.</span>
+                            </div>
+                            <img src="{% static 'main/assets/images/welcome.jpg' %}" alt="">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="right-content">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="right-first-image">
+                                    <div class="thumb">
+                                        <div class="inner-content">
+                                            <h4>Women</h4>
+                                            <span>Timeless Pieces</span>
+                                        </div>
+                                        <div class="hover-content">
+                                            <div class="inner">
+                                                <h4>Women</h4>
+                                                <p>Cozy essentials to statement looks.</p>
+                                                <div class="main-border-button">
+                                                    <a href="#women">Shop Women’s</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <img src="{% static 'main/assets/images/wPic.jpg' %}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="right-first-image">
+                                    <div class="thumb">
+                                        <div class="inner-content">
+                                            <h4>Men</h4>
+                                            <span>Wear Better</span>
+                                        </div>
+                                        <div class="hover-content">
+                                            <div class="inner">
+                                                <h4>Men</h4>
+                                                <p>Premium fabrics. Timeless designs.</p>
+                                                <div class="main-border-button">
+                                                    <a href="#men">Explore the Edit</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <img src="{% static 'main/assets/images/mPic.jpg' %}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="section" id="men">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="section-heading">
+                        <h2>Men’s New Arrivals</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="men-item-carousel">
+                        <div class="owl-men-item owl-carousel">
+                            {% for p in men_products %}
+                                <div class="item">
+                                    <div class="thumb">
+                                        <a href="{% url 'single_product' p.product_id %}">
+                                            <img src="{% static 'main/assets/images/' %}{{ p.image_path }}" alt="{{ p.name }}">
+                                        </a>
+                                    </div>
+                                    <div class="down-content">
+                                    <a href="{% url 'single_product' p.product_id %}">
+                                        <h4>{{ p.name }}</h4>
+                                    </a>
+                                    <span>RM {{ p.price|floatformat:2 }}</span> </div>
+                                </div>
+                            {% empty %}
+                                <p>No men's products available.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="women">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="section-heading">
+                        <h2>Women’s New Arrivals</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="women-item-carousel">
+                        <div class="owl-women-item owl-carousel">
+                            {% for p in women_products %}
+                                <div class="item">
+                                    <div class="thumb">
+                                        <a href="{% url 'single_product' p.product_id %}">
+                                            <img src="{% static 'main/assets/images/' %}{{ p.image_path }}" alt="{{ p.name }}">
+                                        </a>
+                                    </div>
+                                    <div class="down-content">
+                                    <a href="{% url 'single_product' p.product_id %}">
+                                        <h4>{{ p.name }}</h4>
+                                    </a>
+                                    <span>RM {{ p.price|floatformat:2 }}</span> </div>
+                                </div>
+                            {% empty %}
+                                <p>No women's products available.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="under-footer">
+                        <p>Copyright © 2026 Thryft Co., Ltd. All Rights Reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'main/assets/js/jquery-2.1.0.min.js' %}"></script>
+    <script src="{% static 'main/assets/js/popper.js' %}"></script>
+    <script src="{% static 'main/assets/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'main/assets/js/owl-carousel.js' %}"></script>
+    <script src="{% static 'main/assets/js/custom.js' %}"></script>
+
+  </body>
+</html>
+
+<style>
+    .thumb img {
+        width: 360px;
+        height: 360px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+</style>
+<script src="{% static 'main/assets/js/jquery-2.1.0.min.js' %}"></script>
+
+<script src="{% static 'main/assets/js/popper.js' %}"></script>
+<script src="{% static 'main/assets/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'main/assets/js/owl-carousel.js' %}"></script>
+
+<script src="{% static 'main/assets/js/scrollreveal.min.js' %}"></script>
+
+<script src="{% static 'main/assets/js/custom.js' %}"></script>

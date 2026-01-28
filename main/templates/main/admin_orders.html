@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Manage Orders - Thryft Staff</title>
+  <link rel="stylesheet" href="{% static 'main/assets/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'main/assets/css/font-awesome.css' %}">
+  <style>
+      body { padding: 30px; background: #f5f5f5; }
+      .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+      .badge-unassigned { background-color: #ffc107; color: #212529; }
+      .badge-assigned { background-color: #17a2b8; color: white; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fa fa-list-alt"></i> Customer Orders</h2>
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+
+    <table class="table table-hover table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Total (RM)</th>
+                <th>Handled By</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for o in orders %}
+            <tr>
+                <td><strong>#{{ o.order_id }}</strong></td>
+                <td>{{ o.order_date|date:"d M Y, H:i" }}</td>
+                <td>
+                    {{ o.customer.customer.name }}<br>
+                    <small class="text-muted">{{ o.customer.customer.email }}</small>
+                </td>
+                <td class="font-weight-bold">{{ o.total_amount }}</td>
+                <td>
+                    {% if o.staff %}
+                        <span class="badge badge-assigned"><i class="fa fa-user-check"></i> {{ o.staff.staff_id.name }}</span>
+                    {% else %}
+                        <span class="badge badge-unassigned">Unassigned</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if not o.staff %}
+                    <form method="post" action="{% url 'admin_order_assign' o.order_id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-sm">Process Order</button>
+                    </form>
+                    {% endif %}
+                    
+                    <a href="{% url 'admin_order_details' o.order_id %}" class="btn btn-primary btn-sm">
+                        <i class="fa fa-eye"></i> View Items
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">No orders placed yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

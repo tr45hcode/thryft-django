@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Staff Dashboard - Thryft</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link rel="stylesheet" href="{% static 'main/assets/css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'main/assets/css/font-awesome.css' %}">
+  <link rel="stylesheet" href="{% static 'main/assets/css/templatemo-hexashop.css' %}">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f5f5f5;
+    }
+
+    .admin-header {
+      background-color: #2a2a2a;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .admin-container {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .admin-card {
+      padding: 20px;
+      background-color: #f1f1f1;
+      border-radius: 10px;
+      text-align: center;
+      transition: 0.3s;
+      cursor: pointer;
+      display: block;
+      color: #333;
+      text-decoration: none;
+    }
+
+    .admin-card:hover {
+      background-color: #ff6f61;
+      color: white;
+      text-decoration: none;
+    }
+
+    .admin-card i {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+    
+    .back-home {
+      display: inline-block;
+      margin-top: 10px;
+      color: #aaa;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    
+    .back-home:hover {
+      color: #fff;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="admin-header">
+    <h1>Staff Dashboard</h1>
+    <a href="{% url 'home' %}" class="back-home"><i class="fa fa-arrow-left"></i> Back to Main Site</a>
+  </div>
+
+  <div class="admin-container">
+    <h2>Welcome, {{ request.session.username|default:"Staff Member" }}</h2>
+    <p>Manage your site inventory, users, and customer orders below.</p>
+
+    <div class="admin-grid">
+      <a href="{% url 'admin_products' %}" class="admin-card">
+        <i class="fa fa-shopping-bag"></i><br> Manage Products
+      </a>
+      
+      <a href="{% url 'admin_users' %}" class="admin-card">
+        <i class="fa fa-users"></i><br> Manage Users
+      </a>
+      
+      <a href="{% url 'admin_orders' %}" class="admin-card">
+        <i class="fa fa-list"></i><br> View Orders
+      </a>
+      
+      <a href="{% url 'logout' %}" class="admin-card" style="background-color: #f8d7da; color: #721c24;">
+        <i class="fa fa-sign-out"></i><br> Logout
+      </a>
+    </div>
+  </div>
+
+</body>
+</html>

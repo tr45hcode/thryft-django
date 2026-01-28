@@ -1,0 +1,109 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard - Thryft</title>
+  
+  <link rel="stylesheet" href="{% static 'main/assets/css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'main/assets/css/fontawesome.css' %}">
+  <link rel="stylesheet" href="{% static 'main/assets/css/templatemo-hexashop.css' %}">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+    }
+
+    .dashboard-header {
+      background-color: #2a2a2a;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .dashboard-container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .dashboard-welcome {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      padding: 20px;
+      background-color: #f1f1f1;
+      border-radius: 10px;
+      text-align: center;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      background-color: #2a2a2a; /* Changed to match theme */
+      color: white;
+    }
+    
+    /* Using Django URL tags in onclick events */
+    /* Note: Ideally, these should be <a> tags for accessibility, but this keeps your design */
+  </style>
+</head>
+
+<body>
+
+  <div class="dashboard-header">
+    <h1>Welcome to Thryft Dashboard</h1>
+  </div>
+
+  <div class="dashboard-container">
+    <div class="dashboard-welcome">
+      {# Check session for username, default to 'User' if missing #}
+      <h2>Hello, {{ request.session.username|default:"User" }}!</h2>
+      <p>Select an option below to get started.</p>
+    </div>
+
+    <div class="dashboard-grid">
+      {# We use {% url 'name' %} to generate the correct paths #}
+      
+      <div class="card" onclick="location.href='{% url 'profile' %}'">
+        <i class="fa fa-user" style="font-size: 24px; margin-bottom: 10px;"></i><br>
+        My Profile
+      </div>
+
+      <div class="card" onclick="location.href='{% url 'order_history' %}'">
+        <i class="fa fa-box" style="font-size: 24px; margin-bottom: 10px;"></i><br>
+        Orders
+      </div>
+
+      <div class="card" onclick="location.href='{% url 'cart' %}'">
+        <i class="fa fa-shopping-cart" style="font-size: 24px; margin-bottom: 10px;"></i><br>
+        Cart
+      </div>
+
+      <div class="card" onclick="location.href='{% url 'logout' %}'" style="background-color: #ffcccb; color: #a00;">
+        <i class="fa fa-sign-out-alt" style="font-size: 24px; margin-bottom: 10px;"></i><br>
+        Log Out
+      </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="{% url 'home' %}">Back to Home</a>
+    </div>
+  </div>
+
+</body>
+</html>

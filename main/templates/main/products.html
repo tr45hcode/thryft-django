@@ -1,0 +1,220 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Thryft - Product Listing Page</title>
+
+    <link rel="stylesheet" href="{% static 'main/assets/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'main/assets/css/font-awesome.css' %}">
+    <link rel="stylesheet" href="{% static 'main/assets/css/templatemo-hexashop.css' %}">
+    <link rel="stylesheet" href="{% static 'main/assets/css/owl-carousel.css' %}">
+    <link rel="stylesheet" href="{% static 'main/assets/css/lightbox.css' %}">
+
+    <style>
+        .thumb img {
+            width: 340px;
+            height: 340px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .down-content form { margin-top: 10px; }
+        .down-content input[type="number"] {
+            padding: 5px; border: 1px solid #ccc;
+            border-radius: 5px; text-align: center;
+        }
+        .item { height: 100%; display: flex; flex-direction: column; }
+        .down-content { flex-grow: 1; display: flex; flex-direction: column; }
+    </style>
+  </head>
+    
+  <body>
+    
+    <header class="header-area header-sticky">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <nav class="main-nav">
+                        <a href="{% url 'home' %}" class="logo">
+                            <img src="{% static 'main/assets/images/trift.png' %}" alt="Thryft Logo">
+                        </a>
+                        <ul class="nav">
+                            <li><a href="{% url 'home' %}">Home</a></li>
+                            <li><a href="{% url 'home' %}#men">Men's</a></li>
+                            <li><a href="{% url 'home' %}#women">Women's</a></li>
+                            <li><a href="{% url 'products' %}" class="active">Products</a></li>
+                            
+                            {% if request.session.username %}
+                                <li>
+                                    <a href="{% url 'cart' %}">
+                                        <i class='fas fa-cart-plus' style='font-size:18px; padding-top: 10px;'></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'dashboard' %}" title="User Dashboard">
+                                        <i class="fa fa-user" style="font-size: 20px;"></i>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li><a href="{% url 'login' %}">Login</a></li>
+                            {% endif %}
+                        </ul>        
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="page-heading" id="top">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="inner-content">
+                        <h2>Check Our Products</h2>
+                        <span>The best stuff from Thryft.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if messages %}
+        {% for message in messages %}
+            <div id="toast" style="display:block; position:fixed; bottom:20px; right:20px; background-color:#333; color:#fff; padding:12px 20px; border-radius:6px; box-shadow:0 2px 10px rgba(0,0,0,0.2); z-index:9999; opacity: 1; transition: opacity 1s ease;">
+                {{ message }}
+            </div>
+            <script>
+                setTimeout(() => {
+                    const toast = document.getElementById('toast');
+                    if (toast) {
+                        toast.style.opacity = '0';
+                        setTimeout(() => toast.style.display = 'none', 1000);
+                    }
+                }, 3000);
+            </script>
+        {% endfor %}
+    {% endif %}
+
+    <section class="section" id="products">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-heading">
+                        <h2>Our Latest Products</h2>
+                        <span>Check out all of our products.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                {% if all_products %}
+                    {% for p in all_products %}
+                    <div class="col-lg-4">
+                        <div class="item d-flex flex-column">
+                            <div class="thumb">
+                                <img src="{% static 'main/assets/images/' %}{{ p.image_path }}" alt="{{ p.name }}">
+                            </div>
+                            <div class="down-content">
+                                <h4>{{ p.name }}</h4>
+                                <span>RM {{ p.price }}</span>
+                                
+                                <form method="post" action="{% url 'add_to_cart' %}" style="margin-top:0px; margin-bottom: 50px;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="product_id" value="{{ p.product_id }}">
+                                    
+                                    <div style="display: flex; align-items: center; justify-content:flex-end;">
+                                        <input type="number" name="quantity" value="1" min="1" style="width: 60px;">
+                                        <button type="submit" class="btn btn-sm btn-primary" style="margin-left: 10px; height:35px; background-color:black; border:black;">
+                                            <i class="fa fa-shopping-cart"></i> Add to Cart
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-lg-12">
+                        <p>No products available.</p>
+                    </div>
+                {% endif %}
+
+                <div class="col-lg-12">
+                    <div class="pagination">
+                        <ul>
+                            <li class="active"><a href="#">1</a></li>
+                            <li><a href="#">2</a></li>
+                            <li><a href="#">3</a></li>
+                            <li><a href="#">></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="first-item">
+                        <div class="logo">
+                            <img src="{% static 'main/assets/images/trift.png' %}" alt="Thryft Logo">
+                        </div>
+                        <ul>
+                            <li><a href="#">Persiaran Multimedia, Seksyen 7, Jalan Plumbum 7/102, I-City, 40000 Shah Alam, Selangor</a></li>
+                            <li><a href="#">thryfster@gmail.com</a></li>
+                            <li><a href="#">013-332-7313</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <h4>Shopping &amp; Categories</h4>
+                    <ul>
+                        <li><a href="#">Men’s Shopping</a></li>
+                        <li><a href="#">Women’s Shopping</a></li>
+                        <li><a href="#">Kid's Shopping</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h4>Useful Links</h4>
+                    <ul>
+                        <li><a href="{% url 'home' %}">Homepage</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Help</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h4>Help &amp; Information</h4>
+                    <ul>
+                        <li><a href="#">Help</a></li>
+                        <li><a href="#">FAQ's</a></li>
+                        <li><a href="#">Shipping</a></li>
+                        <li><a href="#">Tracking ID</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-12">
+                    <div class="under-footer">
+                        <p>Copyright © 2026 Thryft Co., Ltd. All Rights Reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'main/assets/js/jquery-2.1.0.min.js' %}"></script>
+    <script src="{% static 'main/assets/js/popper.js' %}"></script>
+    <script src="{% static 'main/assets/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'main/assets/js/owl-carousel.js' %}"></script>
+    <script src="{% static 'main/assets/js/scrollreveal.min.js' %}"></script>
+    <script src="{% static 'main/assets/js/waypoints.min.js' %}"></script>
+    <script src="{% static 'main/assets/js/jquery.counterup.min.js' %}"></script>
+    <script src="{% static 'main/assets/js/imgfix.min.js' %}"></script> 
+    <script src="{% static 'main/assets/js/slick.js' %}"></script> 
+    <script src="{% static 'main/assets/js/lightbox.js' %}"></script> 
+    <script src="{% static 'main/assets/js/isotope.js' %}"></script> 
+    <script src="{% static 'main/assets/js/custom.js' %}"></script>
+
+  </body>
+</html>

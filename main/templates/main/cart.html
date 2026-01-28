@@ -1,0 +1,203 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Thryft - Your Cart</title>
+
+    <link rel="stylesheet" href="{% static 'main/assets/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'main/assets/css/font-awesome.css' %}">
+    <link rel="stylesheet" href="{% static 'main/assets/css/templatemo-hexashop.css' %}">
+    <link rel="stylesheet" href="{% static 'main/assets/css/owl-carousel.css' %}">
+    <link rel="stylesheet" href="{% static 'main/assets/css/lightbox.css' %}">
+
+    <style>
+        .thumb img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .cart-summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+        .cart-summary-left { text-align: left; flex: 1; padding-right: 20px; }
+        .cart-summary-right { text-align: right; flex: 1; }
+        
+        .delete-btn {
+            background-color: #ff4444; color: white; border: none;
+            padding: 8px 16px; border-radius: 3px; cursor: pointer;
+            font-size: 14px; transition: all 0.3s ease; display: inline-flex;
+            align-items: center; gap: 6px;
+        }
+        .delete-btn:hover { background-color: #cc0000; transform: translateY(-1px); }
+        
+        .quantity-controls { display: flex; align-items: center; gap: 5px; }
+        .quantity-controls form { margin: 0; padding: 0; line-height: 1; }
+        .quantity-controls button {
+            background-color: #f0f0f0; border: 1px solid #ccc; color: #333;
+            cursor: pointer; font-size: 0.9em; width: 25px; height: 25px;
+            display: flex; justify-content: center; align-items: center;
+            border-radius: 4px; padding: 0;
+        }
+        .quantity-controls button:hover { background-color: #e2e6ea; }
+        .current-quantity { font-size: 1em; font-weight: bold; color: #333; min-width: 20px; text-align: center; }
+    </style>
+
+    <script>
+        function confirmDelete(productName) {
+            return confirm('Are you sure you want to remove "' + productName + '" from your cart?');
+        }
+    </script>
+  </head>
+    
+  <body>
+    
+    <header class="header-area header-sticky">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <nav class="main-nav">
+                        <a href="{% url 'home' %}" class="logo">
+                            <img src="{% static 'main/assets/images/trift.png' %}" alt="Thryft Logo">
+                        </a>
+                        <ul class="nav">
+                            <li><a href="{% url 'home' %}">Home</a></li>
+                            <li><a href="{% url 'products' %}">Products</a></li>
+                            
+                            {% if request.session.username %}
+                                <li><a href="{% url 'cart' %}" class="active"><i class='fas fa-cart-plus' style='font-size:18px;'></i></a></li>
+                                <li><a href="{% url 'dashboard' %}"><i class="fa fa-user" style="font-size: 20px;"></i></a></li>
+                            {% else %}
+                                <li><a href="{% url 'login' %}">Login</a></li>
+                            {% endif %}
+                        </ul>        
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+    <section class="section" id="products">
+        <div class="container" style="margin-top:80px;">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-heading">
+                        <h2>Your Cart</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                {% if not cart_items %}
+                    <div class="col-lg-12 text-center">
+                        <h4 style="color: #777;">Your cart is currently empty.</h4>
+                        <a href="{% url 'products' %}" class="btn btn-secondary mt-3">Start Shopping</a>
+                    </div>
+                {% else %}
+                    
+                    {% for item in cart_items %}
+                    <div class="col-12 mb-4">
+                        <div class="item d-flex align-items-center" style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; background: white;">
+                            
+                            <div class="thumb" style="flex: 0 0 120px; margin-right: 20px; overflow: hidden;">
+                                <img src="{% static 'main/assets/images/' %}{{ item.product.image_path }}" alt="{{ item.product.name }}">
+                            </div>
+
+                            <div class="down-content" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                <div style="flex-grow: 1;">
+                                    <h4 style="margin: 0;">{{ item.product.name }}</h4>
+                                    <p style="margin: 5px 0; color: #aaa;">Category: {{ item.product.category }}</p>
+                                    
+                                    <div style="margin: 0; display: flex; align-items: center; gap: 10px;">
+                                        <span style="font-size: 16px; color: #2a2a2a;">RM {{ item.product.price }}</span>
+                                        <span>x</span>
+                                        
+                                        <div class="quantity-controls">
+                                            <form action="{% url 'update_cart' %}" method="post">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="action" value="decrement">
+                                                <input type="hidden" name="product_id" value="{{ item.product.product_id }}">
+                                                <button type="submit">-</button>
+                                            </form>
+
+                                            <span class="current-quantity">{{ item.quantity }}</span>
+
+                                            <form action="{% url 'update_cart' %}" method="post">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="action" value="increment">
+                                                <input type="hidden" name="product_id" value="{{ item.product.product_id }}">
+                                                <button type="submit">+</button>
+                                            </form>
+                                        </div>
+
+                                        <strong style="margin-left: 10px;">
+                                            = RM {{ item.total_price|floatformat:2 }}
+                                        </strong>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <form action="{% url 'remove_cart_item' %}" method="POST" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="product_id" value="{{ item.product.product_id }}">
+                                        <button type="submit" class="delete-btn" onclick="return confirmDelete('{{ item.product.name }}')">
+                                            <i class="fa fa-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <div class="col-12">
+                        <div class="cart-summary-row">
+                            <div class="cart-summary-left">
+                                {% if user_address %}
+                                    <h5>Delivery Address:</h5>
+                                    <p>{{ user_address }}</p>
+                                    <a href="{% url 'profile' %}" style="font-size: 12px;">Change Address</a>
+                                {% else %}
+                                    <p style="color: red;"><strong>No delivery address found.</strong></p>
+                                    <a href="{% url 'profile' %}" class="btn btn-warning btn-sm">Add Address</a>
+                                {% endif %}
+                            </div>
+
+                            <div class="cart-summary-right">
+                                <h3>Total: RM {{ grand_total|floatformat:2 }}</h3>
+                                <br>
+                                {% if user_address %}
+                                    <form action="{% url 'process_payment' %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-primary">Checkout</button>
+                                    </form>
+                                {% else %}
+                                    <button class="btn btn-secondary" disabled title="Add address first">Checkout</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                {% endif %}
+            </div>
+        </div>
+    </section>
+    
+    <script src="{% static 'main/assets/js/jquery-2.1.0.min.js' %}"></script>
+    <script src="{% static 'main/assets/js/popper.js' %}"></script>
+    <script src="{% static 'main/assets/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'main/assets/js/owl-carousel.js' %}"></script>
+    <script src="{% static 'main/assets/js/custom.js' %}"></script>
+  </body>
+</html>

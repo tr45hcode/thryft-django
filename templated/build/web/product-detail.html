@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Detail</title>
+    <link rel="stylesheet" href="assets/css/templatemo-hexashop.css">
+    <style>
+        .product-detail {
+            padding: 60px 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+        .product-detail img {
+            width: 100%;
+            height: auto;              
+            max-height: 400px;
+            object-fit: contain;
+            margin-bottom: 20px;
+            background-color: #f5f5f5; 
+            border-radius: 10px;       
+        }
+
+        .product-detail h2 {
+            font-size: 24px;
+        }
+        .product-detail p {
+            margin: 10px 0;
+        }
+        .add-to-cart {
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="product-detail">
+        <img id="product-image" src="" alt="Product Image">
+        <h2 id="product-title">Product Title</h2>
+        <p id="product-description">Product description goes here.</p>
+        <button class="add-to-cart">Add to Cart</button>
+    </div>
+
+    <script>
+    // Example product data - normally fetched from a JSON or API
+    const products = {
+        1: {
+            title: "Black Shirt",
+            description: "Stylish black shirt with premium fabric.",
+            image: "assets/images/black.jpg"
+        },
+        2: {
+            title: "White Shirt",
+            description: "Classic white shirt, fits all occasions.",
+            image: "assets/images/whiteshirt.jpg"
+        },
+        3: {
+            title: "Navy Pants",
+            description: "Elegant navy blue pants for formal wear.",
+            image: "assets/images/navypants.jpg"
+        }
+    };
+
+    // Get product ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+
+    const product = products[productId];
+
+    if (product) {
+        document.getElementById('product-title').textContent = product.title;
+        document.getElementById('product-description').textContent = product.description;
+        document.getElementById('product-image').src = product.image;
+
+        // Add to Cart button functionality
+        document.querySelector('.add-to-cart').addEventListener('click', function () {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+            // Optional: avoid duplicates by checking title
+            if (!cart.find(item => item.title === product.title)) {
+                cart.push(product);
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+
+            // Redirect to cart.html
+            window.location.href = 'cart.html';
+        });
+    } else {
+        document.querySelector('.product-detail').innerHTML = "<p>Product not found.</p>";
+    }
+</script>
+
+
+</body>
+</html>

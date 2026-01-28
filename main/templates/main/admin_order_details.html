@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Details #{{ order.order_id }} - Thryft Staff</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'main/assets/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'main/assets/css/font-awesome.css' %}">
+    <style>
+        body { background-color: #f4f7f6; padding: 40px 0; font-family: 'Segoe UI', sans-serif; }
+        .detail-container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .section-header { border-bottom: 2px solid #f1f1f1; margin-bottom: 20px; padding-bottom: 10px; color: #333; }
+        .info-label { font-weight: bold; color: #666; width: 150px; display: inline-block; }
+        .product-img { width: 60px; height: 60px; object-fit: cover; border-radius: 5px; margin-right: 15px; border: 1px solid #ddd; }
+        .status-badge { font-size: 0.9rem; padding: 6px 15px; border-radius: 50px; }
+        .total-row { font-size: 1.25rem; font-weight: bold; background: #f9f9f9; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="detail-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <a href="{% url 'admin_orders' %}" class="btn btn-outline-secondary">
+                <i class="fa fa-arrow-left"></i> Back to Orders
+            </a>
+            <button onclick="window.print();" class="btn btn-info">
+                <i class="fa fa-print"></i> Print Invoice
+            </button>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <h4 class="section-header">Order Info</h4>
+                <p><span class="info-label">Order ID:</span> #{{ order.order_id }}</p>
+                <p><span class="info-label">Date:</span> {{ order.order_date|date:"d M Y, h:i A" }}</p>
+                <p><span class="info-label">Status:</span> 
+                    {% if order.staff %}
+                        <span class="badge badge-success status-badge">Processed</span>
+                    {% else %}
+                        <span class="badge badge-warning status-badge">Pending</span>
+                    {% endif %}
+                </p>
+            </div>
+            
+            <div class="col-md-6">
+                <h4 class="section-header">Customer Details</h4>
+                <p><span class="info-label">Name:</span> {{ order.customer.customer.name }}</p>
+                <p><span class="info-label">Email:</span> {{ order.customer.customer.email }}</p>
+                <p><span class="info-label">Address:</span> {{ order.customer.customer.address|default:"No address provided" }}</p>
+            </div>
+        </div>
+
+        <h4 class="section-header mt-4">Items Ordered</h4>
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th class="text-right">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="{% static 'main/assets/images/' %}{{ item.product.image_path }}" class="product-img" alt="{{ item.product.name }}">
+                                <span>{{ item.product.name }}</span>
+                            </div>
+                        </td>
+                        <td>RM{{ item.product.price }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td class="text-right font-weight-bold">RM{{ item.subtotal }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="total-row">
+                        <td colspan="3" class="text-right">Total Amount:</td>
+                        <td class="text-right text-primary">RM{{ order.total_amount }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4 p-3 border rounded bg-light">
+            <h5><i class="fa fa-credit-card"></i> Payment Summary</h5>
+            {% if payment %}
+                <p class="mb-1"><strong>Method:</strong> {{ payment.payment_method }}</p>
+                <p class="mb-1"><strong>Transaction Date:</strong> {{ payment.payment_date|date:"d M Y, h:i A" }}</p>
+                <p class="mb-0"><strong>Amount Paid:</strong> RM{{ payment.amount }}</p>
+            {% else %}
+                <p class="text-danger mb-0">No payment record found for this order.</p>
+            {% endif %}
+        </div>
+
+        {% if not order.staff %}
+        <div class="mt-4 text-center">
+            <form method="post" action="{% url 'admin_order_assign' order.order_id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success btn-lg px-5">
+                    <i class="fa fa-check"></i> Mark as Processed
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>
