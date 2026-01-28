@@ -1,69 +1,100 @@
-Method 1: Oracle SQL Developer (Visual & Easiest)
+📂 Thryft - E-Commerce Management System
 
-This is the best method if you want to see the script before you run it and ensure there are no errors.
+A robust E-Commerce platform built with Django and Oracle Database. This system features role-based access for Customers and Staff, real-time stock management, and a comprehensive order processing workflow.
+🚀 Getting Started
+1. Prerequisites
 
-    Open SQL Developer and connect to your database.
+Before you begin, ensure you have the following installed:
 
-    Open the File: Go to File > Open and select your .sql file.
+    Python 3.10+
 
-    Check the Schema: Ensure the worksheet is connected to the correct user (top-right corner of the worksheet).
+    Oracle Database (XE or Enterprise Edition)
 
-    Run the Script:
+    Oracle Instant Client (Required for the oracledb / cx_Oracle driver)
 
-        Do NOT click the "Run Statement" button (the single play icon).
+    Git
 
-        Click the Run Script button (the icon with the small paper and a play button, or press F5).
+2. Clone the Repository
+Bash
 
-    Watch the Script Output: The pane at the bottom will show you a log of every table created and every row inserted.
+git clone https://github.com/yourusername/thryft-project.git
+cd thryft-project
 
-    [!TIP] If you see ORA-00955: name is already used by an existing object, it means the table already exists. You might need to add DROP TABLE table_name; lines at the top of your script if you want a fresh start.
+3. Setup Virtual Environment
 
-Method 2: SQL*Plus Command Line (Fastest)
+It is highly recommended to use a virtual environment to keep dependencies isolated.
+Bash
 
-This is the professional way to do it, especially if the file is very large (SQL Developer can lag with huge files).
+# Create the environment
+python -m venv venv
 
-    Place the file: Put your .sql file in a simple folder (e.g., C:\db_work\export.sql).
+# Activate it (Windows)
+venv\Scripts\activate
 
-    Open Command Prompt / Terminal.
+# Activate it (Mac/Linux)
+source venv/bin/activate
 
-    Log in to SQLPlus:
+4. Install Dependencies
+
+Install all required Python packages using the requirements.txt file provided.
+Bash
+
+pip install -r requirements.txt
+
+🗄️ Database Setup (Oracle)
+Importing the .sql Data
+
+If you have a database export file (e.g., backup.sql), follow these steps to import the schema and data into your Oracle instance.
+Option A: Using SQL Developer (Recommended)
+
+    Open Oracle SQL Developer and connect to your database.
+
+    Go to File > Open and select your .sql file.
+
+    Ensure the connection is active in the top-right corner.
+
+    Press F5 (or the "Run Script" icon) to execute the entire file.
+
+    Check the script output for any errors and ensure you see "Commit Complete."
+
+Option B: Using Command Line (SQLPlus)
+Bash
+
+sqlplus your_username/your_password@localhost:1521/xe @path/to/your/backup.sql
+
+⚙️ Configuration
+
+    Database Connection: Open settings.py and ensure the DATABASES section matches your Oracle credentials:
+    Python
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.oracle',
+            'NAME': 'localhost:1521/xe',
+            'USER': 'YOUR_USERNAME',
+            'PASSWORD': 'YOUR_PASSWORD',
+        }
+    }
+
+    Migrations: Even though the models are managed = False, Django needs to initialize the session and admin tables.
     Bash
 
-    sqlplus your_username/your_password@localhost:1521/xe
+    python manage.py migrate
 
-    Run the file using the @ command:
-    SQL
+🏃 Running the Application
 
-    @C:\db_work\export.sql
+Once the database is ready and dependencies are installed, start the development server:
+Bash
 
-    Commit the changes: Oracle doesn't always "save" automatically after a script. Once the script finishes, type:
-    SQL
+python manage.py runserver
 
-    COMMIT;
-    EXIT;
+The application will be available at: http://127.0.0.1:8000/
+🛠️ Project Structure
 
-Common Issues & Troubleshooting
-Error	Meaning	Solution
-ORA-00942	Table or view does not exist	You are trying to insert data or drop a table that isn't created yet. Check the order of your script.
-ORA-02291	Integrity constraint violated	You are trying to insert a "Child" record (like an Order) before the "Parent" record (like a User) exists.
-SP2-0042	Unknown command	You likely have a typo in your SQL file or are trying to run a non-SQL command.
-Important: Handling "Foreign Key" Order
+    /main: Core application logic (Views, Models, Templates).
 
-If your script fails halfway through with Integrity Constraint Errors, it’s because of the order of the tables. You must import in this order:
+    /static: CSS, JavaScript, and Images.
 
-    Level 1 (Parents): USER_TABLE
+    requirements.txt: List of Python dependencies.
 
-    Level 2 (Children): STAFF, CUSTOMER, PRODUCT
-
-    Level 3 (Dependencies): ORDER_TABLE
-
-    Level 4 (Grandchildren): ORDER_ITEM, PAYMENT
-
-Verifying the Import
-
-Once finished, run this quick check in your SQL worksheet to make sure your data actually arrived:
-SQL
-
-SELECT table_name, num_rows 
-FROM user_tables 
-ORDER BY num_rows DESC;
+    README.md: Project documentation.
